@@ -1,0 +1,4 @@
+npm install
+npm install -g node-windows
+npm link node-windows
+node service.js
