@@ -10,6 +10,7 @@ const port = process.env.PORT || 8000;
 const fileUpload = require('express-fileupload');
 const { body, validationResult } = require('express-validator');
 const { engine } = require ('express-handlebars');
+const wpmAleatorio = [80,90,100,110,120,130,140]
 
 const app = express();
 const server = http.createServer(app);
@@ -72,6 +73,12 @@ const createSessionsFileIfNotExists = function() {
       console.log('Failed to create sessions file: ', err);
     }
   }
+}
+
+const delayDeEnvioMensagem = async function(message){
+  const wpmMedio = wpmAleatorio[Math.floor(Math.random()*wpmAleatorio.length)]
+  wpm = (message.split(' ').length / wpmMedio) *60000;
+  await new Promise((r) => setTimeout(r, wpm))
 }
 
 createSessionsFileIfNotExists();
@@ -169,6 +176,7 @@ const createSession = function(id, description) {
       id: id,
       description: description,
       ready: false,
+      
     });
     setSessionsFile(savedSessions);
   }
@@ -310,7 +318,8 @@ app.post('/criar-sessao',
             const savedSessions = getSessionsFile();
             const sessionIndex = savedSessions.findIndex(sess => sess.id == id);
             const tokenN = savedSessions.splice(sessionIndex, 1)[0].description;
-
+           
+            
             if(tokenN !== token){
               res.send(`Acesso não Autorizado!!!`)
             }
@@ -446,6 +455,8 @@ app.post('/zdg-message', [
   const numberDDD = number.substr(2, 2);
   const numberUser = number.substr(-8, 8);
   const message = req.body.message;
+
+   await delayDeEnvioMensagem(message);
 
   if (numberDDI !== "55") {
     const numberZDG = number + "@c.us";
